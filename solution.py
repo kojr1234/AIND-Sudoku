@@ -1,4 +1,5 @@
 from utils import *
+
 row_units = [cross(r, cols) for r in rows]
 column_units = [cross(rows, c) for c in cols]
 square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')]
@@ -40,13 +41,22 @@ def naked_twins(values):
     strategy repeatedly).
     """
     # TODO: Implement this function!
+    # get all the boxes which cantains only two possible numbers
     value2_box = [box for box in boxes if (len(values[box]) == 2)]
     pairs = []
     for box in value2_box:
         for p in peers[box]:
-            if values[value2_box] == values[p]:
-                pairs.append((value2_box, p))
+            if values[box] == values[p]:
+                for common_box in peers[box] & peers[p]:
+                    if len(values[common_box]) > 1:
+                        for digit in values[box]:
+                            if digit in values[common_box]:
+                                values[common_box] = values[common_box].replace(digit, '')
 
+            #[values[common_box].replace(digit, '') for digit in values[box] if len(values[common_box]) > 1
+            #for common_box in peers[box] & peers[p] if values[box] == values[p]]
+
+    return values
 
 
 
@@ -156,6 +166,9 @@ def reduce_puzzle(values):
         # Your code here: Use the Only Choice Strategy
         values = only_choice(values)
 
+        # Apply the naked wins method
+        values = naked_twins(values)
+
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
 
@@ -243,10 +256,9 @@ if __name__ == "__main__":
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     display(result)
-
     try:
         import PySudoku
-        PySudoku.play(grid2values(diag_sudoku_grid), result, history)
+        # PySudoku.play(grid2values(diag_sudoku_grid), result, history)
 
     except SystemExit:
         pass
