@@ -166,9 +166,6 @@ def reduce_puzzle(values):
         # Your code here: Use the Only Choice Strategy
         values = only_choice(values)
 
-        # Apply the naked wins method
-        values = naked_twins(values)
-
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
 
@@ -225,6 +222,10 @@ def search(values):
     for digit in values[min_box]:
         values_copy = values.copy()
         values_copy[min_box] = digit
+
+        #apply the naked twins function
+        values = naked_twins(values)
+
         values_copy = search(values_copy)
         if values_copy is not False:
             return values_copy
@@ -252,10 +253,14 @@ def solve(grid):
 
 
 if __name__ == "__main__":
-    diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
+    diag_sudoku_grid = '...58.4...3.2.7.5.8.........1.....692.......146.....2.........5.2.6.5.1...4.73...'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
-    display(result)
+    if result:
+        display(result)
+    else:
+        print("Falhou!")
     try:
         import PySudoku
         # PySudoku.play(grid2values(diag_sudoku_grid), result, history)
