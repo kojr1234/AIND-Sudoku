@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 s is a comment.
 # Each line is a file pattern followed by one or more owners.
 
@@ -5,3 +6,12 @@ s is a comment.
 # the repo.
 *       @cgearhart @luisguiserrano
 
+=======
+s is a comment.
+# Each line is a file pattern followed by one or more owners.
+
+# These owners will be the default owners for everything in
+# the repo.
+*       @cgearhart @luisguiserrano
+
+>>>>>>> b102c115033200c8a0aa8489b5e8bb21aa3c03f2
