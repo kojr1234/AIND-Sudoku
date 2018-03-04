@@ -3,6 +3,10 @@ tests does not guarantee that your solution is correct. The Project Asssistant t
 many additional test cases that you must also pass to complete the project. You should write your
 own additional test cases to cover any failed tests shown in the Project Assistant feedback.
 """
+import sys
+
+sys.path.insert(0, 'C://Users//Fabio Kimio//Desktop//Courses/Udacity//AI Engineer NanoDegree//AIND-Sudoku')
+
 import unittest
 import solution
 
