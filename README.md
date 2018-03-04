@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 # Solve Sudoku with AI
-
-This is my test
 
 ## Synopsis
 
