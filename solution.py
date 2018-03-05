@@ -39,11 +39,11 @@ def naked_twins(values):
     The first convention is preferred for consistency with the other strategies,
     and because it is simpler (since the reduce_puzzle function already calls this
     strategy repeatedly).
-    """
-    # TODO: Implement this function!
-    # get all the boxes which cantains only two possible numbers
+
+    -----
+    my solution
+
     value2_box = [box for box in boxes if (len(values[box]) == 2)]
-    pairs = []
     for box in value2_box:
         for p in peers[box]:
             if values[box] == values[p]:
@@ -51,14 +51,62 @@ def naked_twins(values):
                     if len(values[common_box]) > 1:
                         for digit in values[box]:
                             if digit in values[common_box]:
+                                print("{} OLD value: {}".format(common_box, values[common_box]))
                                 values[common_box] = values[common_box].replace(digit, '')
-
-            #[values[common_box].replace(digit, '') for digit in values[box] if len(values[common_box]) > 1
-            #for common_box in peers[box] & peers[p] if values[box] == values[p]]
+                                print("{} NEW value: {}".format(common_box, values[common_box]))
 
     return values
 
 
+    value2_box = [box for box in boxes if (len(values[box]) == 2)]
+    pairs = [(box1, box2) for box1 in value2_box for box2 in peers[box1] if values[box1] == values[box2]]
+
+    for pair in pairs:
+        for unit in unitlist:
+            if pair[0] in unit and pair[1] in unit:
+                for box in unit:
+                    if box != pair[0] and box != pair[1] and len(values[box]) > 1:
+                        for digit in values[pair[0]]:
+                            if digit in values[box]:
+                                print("{} OLD value: {}".format(box, values[box]))
+                                assign_value(values, box, values[box].replace(digit, ""))
+                                print("{} NEW value LA: {}".format(box, values[box]))
+
+    return values
+
+    """
+    # TODO: Implement this function!
+    # get all boxes with exactly 2 possible values
+    value2_box = [box for box in boxes if (len(values[box]) == 2)]
+
+    # get all the pairs that belongs to the same unit
+    pairs = [(box1, box2) for box1 in value2_box for box2 in peers[box1] if values[box1] == values[box2]]
+
+    # iterating over the pairs
+    for pair in pairs:
+
+        # iterates over the unit list
+        for unit in unitlist:
+
+            # if the pair belongs to the same unit
+            if pair[0] in unit and pair[1] in unit:
+
+                # iterate over the unit
+                for box in unit:
+
+                    # I only want the boxes different of the pair
+                    if box != pair[0] and box != pair[1]:
+
+                        # only unsolved boxes
+                        if len(values[box]) > 1:
+
+                            # at this step, I already have the values and the unsolved box
+                            # now, I want to delete the pairs values from other boxes in the same peer.
+                            # first digit of the pair's value
+                            for value in values[pair[0]]:
+                                values = assign_value(values, box, values[box].replace(value, ''))
+
+    return values
 
 def eliminate(values):
     """Apply the eliminate strategy to a Sudoku puzzle
@@ -77,16 +125,12 @@ def eliminate(values):
         The values dictionary with the assigned values eliminated from peers
     """
     # TODO: Copy your code from the classroom to complete this function
-    new_values = dict.copy(values)
-    for box in boxes:
-        valid_num = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
-        if len(values[box]) > 1:
-            for p in peers[box]:
-                if values[p] in valid_num:
-                    valid_num.remove(values[p])
-            new_values[box] = ''.join(valid_num)
-
-    return new_values
+    solved_values = [box for box in values.keys() if len(values[box]) == 1]
+    for box in solved_values:
+        digit = values[box]
+        for peer in peers[box]:
+            values = assign_value(values, peer, values[peer].replace(digit, ''))
+    return values
 
 
 
@@ -111,33 +155,12 @@ def only_choice(values):
     You should be able to complete this function by copying your code from the classroom
     """
     # TODO: Copy your code from the classroom to complete this function
-
     for unit in unitlist:
-        for box in unit:
-            if len(values[box]) == 1:
-                continue
-            else:
-                flag = False
-                digits = values[box]
-                for digit in digits:
-                    unique_digit = ''
-                    for other_box in unit:
-                        if box != other_box:
-                            if digit in values[other_box]:
-                                flag = False
-                                break
-                        flag = True
-                        unique_digit = digit
-                    if flag is True:
-                        values[box] = unique_digit
-
+        for digit in '123456789':
+            dplaces = [box for box in unit if digit in values[box]]
+            if len(dplaces) == 1:
+                values = assign_value(values, dplaces[0], digit)
     return values
-
-
-
-
-
-
 
 
 def reduce_puzzle(values):
@@ -165,6 +188,9 @@ def reduce_puzzle(values):
 
         # Your code here: Use the Only Choice Strategy
         values = only_choice(values)
+
+        # Call Naked Twins function
+        values = naked_twins(values)
 
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])
@@ -222,13 +248,9 @@ def search(values):
     for digit in values[min_box]:
         values_copy = values.copy()
         values_copy[min_box] = digit
-
-        #apply the naked twins function
-        values = naked_twins(values)
-
-        values_copy = search(values_copy)
-        if values_copy is not False:
-            return values_copy
+        attempt = search(values_copy)
+        if attempt:
+            return attempt
 
 
 
@@ -254,7 +276,7 @@ def solve(grid):
 
 if __name__ == "__main__":
     #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
-    diag_sudoku_grid = '...58.4...3.2.7.5.8.........1.....692.......146.....2.........5.2.6.5.1...4.73...'
+    diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     if result:
@@ -263,7 +285,7 @@ if __name__ == "__main__":
         print("Falhou!")
     try:
         import PySudoku
-        # PySudoku.play(grid2values(diag_sudoku_grid), result, history)
+        PySudoku.play(grid2values(diag_sudoku_grid), result, history)
 
     except SystemExit:
         pass
