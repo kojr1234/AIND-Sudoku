@@ -39,41 +39,6 @@ def naked_twins(values):
     The first convention is preferred for consistency with the other strategies,
     and because it is simpler (since the reduce_puzzle function already calls this
     strategy repeatedly).
-
-    -----
-    my solution
-
-    value2_box = [box for box in boxes if (len(values[box]) == 2)]
-    for box in value2_box:
-        for p in peers[box]:
-            if values[box] == values[p]:
-                for common_box in peers[box] & peers[p]:
-                    if len(values[common_box]) > 1:
-                        for digit in values[box]:
-                            if digit in values[common_box]:
-                                print("{} OLD value: {}".format(common_box, values[common_box]))
-                                values[common_box] = values[common_box].replace(digit, '')
-                                print("{} NEW value: {}".format(common_box, values[common_box]))
-
-    return values
-
-
-    value2_box = [box for box in boxes if (len(values[box]) == 2)]
-    pairs = [(box1, box2) for box1 in value2_box for box2 in peers[box1] if values[box1] == values[box2]]
-
-    for pair in pairs:
-        for unit in unitlist:
-            if pair[0] in unit and pair[1] in unit:
-                for box in unit:
-                    if box != pair[0] and box != pair[1] and len(values[box]) > 1:
-                        for digit in values[pair[0]]:
-                            if digit in values[box]:
-                                print("{} OLD value: {}".format(box, values[box]))
-                                assign_value(values, box, values[box].replace(digit, ""))
-                                print("{} NEW value LA: {}".format(box, values[box]))
-
-    return values
-
     """
     # TODO: Implement this function!
     # get all boxes with exactly 2 possible values
@@ -275,14 +240,13 @@ def solve(grid):
 
 
 if __name__ == "__main__":
-    #diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
     diag_sudoku_grid = '9.1....8.8.5.7..4.2.4....6...7......5..............83.3..6......9................'
     display(grid2values(diag_sudoku_grid))
     result = solve(diag_sudoku_grid)
     if result:
         display(result)
     else:
-        print("Falhou!")
+        print("Failed!")
     try:
         import PySudoku
         PySudoku.play(grid2values(diag_sudoku_grid), result, history)
